@@ -134,3 +134,6 @@ collaborative/KNNBaseline.dump
 collaborative/model.dump
 
 .DS_Store
+
+articles_embeddings.pickle
+model.dump

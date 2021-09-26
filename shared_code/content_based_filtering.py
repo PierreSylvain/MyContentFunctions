@@ -5,22 +5,16 @@ import pickle
 import numpy as np
 import pandas as pd
 import json
+import os
+import logging
 
 class content_based_filtering:
-    def __init__(self):
-        db_url = "mongodb://127.0.0.1"
-        db_port = 27017
-        db_name = 'mycontent'
-        coll_name = 'mycontent'
-
-        client = MongoClient(db_url, db_port)
-        db = client[db_name]
-        self.mycontent = db[coll_name]       
-        self.df = None
-
+    def __init__(self, filename):
+        self.df = None               
+           
         # Load articles
-        self.articles = pickle.load( open('/Users/pierre-sylvainaugereau/Google Drive/AI Engineer/P9_My-Content/archive/articles_embeddings.pickle', "rb" ) )   
-
+        self.articles = pickle.load( open(filename, "rb" ) )   
+   
     def get_cosine_similarity(self, a, b):
         """Returns the cosine similarity of 2 vectors
         @params
@@ -42,8 +36,21 @@ class content_based_filtering:
 
         Returns:
             int: Article ID
-        """
-        return self.mycontent.find({"user_id": int(user_id)}).sort('click_timestamp', pymongo.DESCENDING)[0]['click_article_id']
+        """        
+        client = MongoClient(os.environ["MONGO_URI"])       
+        db = client['mycontent2']
+        mycontent = db['mycontent']    
+
+        doc = mycontent.find_one(
+                {"user_id": int(user_id)},
+                sort=[('click_timestamp', pymongo.DESCENDING)]
+        )
+        logging.info(doc)
+        if doc is None:
+            return 0
+
+        return doc['click_article_id']
+
 
     def cbf_sort(self, data):
         return data[2]
@@ -57,10 +64,8 @@ class content_based_filtering:
         Returns:
             Array: Array of articles with recommentation score and score rating
         """
-        print(user_id)
-        print(prediction)
-
         article_id = self.get_last_article(user_id)
+        
         self.articles = np.delete(self.articles, (article_id,), axis=0)
         score = []
         for idx, article in enumerate(self.articles):
@@ -81,8 +86,9 @@ class content_based_filtering:
 
         if prediction > 0:
             score_df = score_df['article_id'][:prediction]
-
-        return score_df.to_json(orient = 'records')        
+            return score_df.to_json(orient = 'records')
+            
+        return score_df
         
 
 

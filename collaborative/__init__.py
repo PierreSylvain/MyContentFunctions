@@ -1,9 +1,9 @@
 import logging
-from .collaborative_filtering import collaborative_filtering
+from shared_code.collaborative_filtering import collaborative_filtering
 import azure.functions as func
 
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
     user_id = req.params.get('userId')
@@ -25,7 +25,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             prediction = req_body.get('prediction')
 
     if user_id:
-        cf = collaborative_filtering()        
+        directory = str(context.function_directory) + '/../shared_code/'
+        cf = collaborative_filtering(directory)        
         cf_scores = cf.get_recommendations(user_id, int(prediction))       
         return func.HttpResponse(f"{cf_scores}")
     else:
