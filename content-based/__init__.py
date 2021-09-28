@@ -16,20 +16,20 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         else:
             user_id = req_body.get('userId')
 
-    prediction = req.params.get('prediction')
-    if not prediction:
+    recommendation = req.params.get('recommendation')
+    if not recommendation:
         try:
             req_body = req.get_json()
         except ValueError:
-            prediction = 0
+            recommendation = 2
         else:
-            prediction = req_body.get('prediction')
+            recommendation = req_body.get('recommendation')
     
 
     if user_id:
         filename = str(context.function_directory) + '/../shared_code/articles_embeddings.pickle'
         cbf = content_based_filtering(filename)        
-        cbf_scores = cbf.get_recommendations(user_id, int(prediction))
+        cbf_scores = cbf.get_recommendations(user_id, int(recommendation))
         return func.HttpResponse(f"{cbf_scores}")
     else:
         return func.HttpResponse(

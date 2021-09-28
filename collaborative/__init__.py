@@ -31,7 +31,7 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         try:
             req_body = req.get_json()
         except ValueError:
-            recommendation = 0
+            recommendation = 2
         else:
             recommendation = req_body.get('recommendation')
 

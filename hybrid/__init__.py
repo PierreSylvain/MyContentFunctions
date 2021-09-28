@@ -18,14 +18,14 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         else:
             user_id = req_body.get('userId')
 
-    prediction = req.params.get('prediction')
-    if not prediction:
+    recommendation = req.params.get('recommendation')
+    if not recommendation:
         try:
             req_body = req.get_json()
         except ValueError:
-            prediction = 2
+            recommendation = 2
         else:
-            prediction = req_body.get('prediction')
+            recommendation = req_body.get('recommendation')
     
 
     if user_id:
@@ -41,7 +41,7 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         hybrid['score'] = hybrid['CF'] * 2 + hybrid['CBF']
 
         hybrid = hybrid.sort_values(by=['score'], ascending=False)
-        return func.HttpResponse(f"{hybrid['article_id'][:int(prediction)].to_json(orient = 'records')}")
+        return func.HttpResponse(f"{hybrid['article_id'][:int(recommendation)].to_json(orient = 'records')}")
     else:
         return func.HttpResponse(
              "This HTTP triggered function executed successfully. Pass a userId in the query string or in the request body for a personalized response.",
