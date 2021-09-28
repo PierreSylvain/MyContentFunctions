@@ -1,11 +1,21 @@
+# -----------------------------
+# Collaborative filtering
+# -----------------------------
 import logging
 from shared_code.collaborative_filtering import collaborative_filtering
 import azure.functions as func
 
 
 def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+    ''' Get Score for article recommendation
+        Args:
+            req (HttRequest): user request
+            context (Context): Azure function context
 
+        Returns:
+            HttResponse: List of selected articles
+    '''
+    # User ID
     user_id = req.params.get('userId')
     if not user_id:
         try:
@@ -15,19 +25,21 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         else:
             user_id = req_body.get('userId')
 
-    prediction = req.params.get('prediction')
-    if not prediction:
+    # recommendation (number of)
+    recommendation = req.params.get('recommendation')
+    if not recommendation:
         try:
             req_body = req.get_json()
         except ValueError:
-            prediction = 0
+            recommendation = 0
         else:
-            prediction = req_body.get('prediction')
+            recommendation = req_body.get('recommendation')
 
+    # Do recommendation
     if user_id:
         directory = str(context.function_directory) + '/../shared_code/'
         cf = collaborative_filtering(directory)        
-        cf_scores = cf.get_recommendations(user_id, int(prediction))       
+        cf_scores = cf.get_recommendations(user_id, int(recommendation))       
         return func.HttpResponse(f"{cf_scores}")
     else:
         return func.HttpResponse(
