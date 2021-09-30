@@ -7,7 +7,7 @@ import azure.functions as func
 
 
 def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-    ''' Get Score for article recommendation
+    '''Get Score for article recommendation
         Args:
             req (HttRequest): user request
             context (Context): Azure function context

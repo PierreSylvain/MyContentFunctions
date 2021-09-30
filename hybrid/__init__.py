@@ -7,8 +7,16 @@ import pandas as pd
 
 
 def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+    '''Get Score for article recommendation
+        Args:
+            req (HttRequest): user request
+            context (Context): Azure function context
+
+        Returns:
+            HttResponse: List of selected articles
+    '''    
     
+    # user ID
     user_id = req.params.get('userId')
     if not user_id:
         try:
@@ -18,6 +26,7 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         else:
             user_id = req_body.get('userId')
 
+     # recommendation (number of)
     recommendation = req.params.get('recommendation')
     if not recommendation:
         try:
@@ -27,7 +36,7 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
         else:
             recommendation = req_body.get('recommendation')
     
-
+    # Do recommendation
     if user_id:
         filename = str(context.function_directory) + '/../shared_code/articles_embeddings.pickle'
         cbf = content_based_filtering(filename)        
