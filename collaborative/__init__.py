@@ -37,8 +37,8 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
 
     # Do recommendation
     if user_id:
-        directory = str(context.function_directory) + '/../shared_code/'
-        cf = collaborative_filtering(directory)        
+        model = str(context.function_directory) + '/../shared_code/model.dump'
+        cf = collaborative_filtering(model)        
         cf_scores = cf.get_recommendations(user_id, int(recommendation))       
         return func.HttpResponse(f"{cf_scores}")
     else:

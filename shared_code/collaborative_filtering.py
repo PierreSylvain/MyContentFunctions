@@ -1,3 +1,4 @@
+import logging
 from surprise import dump
 from pymongo import MongoClient
 import pandas as pd
@@ -7,13 +8,14 @@ import os
 class collaborative_filtering:
     """Algorithm for collaborative filtering
     """
-    def __init__(self, directory):
+    def __init__(self, model):
         """Init class : set directory name for data files
 
         Args:
-            directory (string): Directory is stored the surprise algorithm 
+            model (string): Model to load
         """
-        self.directory = directory
+        logging.info(model)        
+        self.model = model
         
     def get_articles_list(self, user_id):
         """Get list of all articles
@@ -40,8 +42,8 @@ class collaborative_filtering:
             json or dataframe: json with the list of articles IDS or dataframe with all the records
         """
         score = []
-        
-        _, algo = dump.load(self.directory + 'model.dump')        
+        logging.info(self.directory + 'model.dump')
+        _, algo = dump.load(self.model)        
         for article_id in self.get_articles_list(user_id):                  
             rating = algo.predict(user_id, article_id)                  
             score.append([rating.uid, rating.iid,rating.est, round(rating.est)])

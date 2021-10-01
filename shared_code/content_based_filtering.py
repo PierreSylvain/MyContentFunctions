@@ -45,7 +45,7 @@ class content_based_filtering:
                 {"user_id": int(user_id)},
                 sort=[('click_timestamp', pymongo.DESCENDING)]
         )
-        logging.info(doc)
+        logging.info(f"last user Doc {doc['click_article_id']}")
         if doc is None:
             return 0
 

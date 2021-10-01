@@ -38,14 +38,17 @@ def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
     
     # Do recommendation
     if user_id:
+        logging.info("Process content filtering")
         filename = str(context.function_directory) + '/../shared_code/articles_embeddings.pickle'
         cbf = content_based_filtering(filename)        
         cbf_scores = cbf.get_recommendations(user_id, 0)
 
-        directory = str(context.function_directory) + '/../shared_code/'
-        cf = collaborative_filtering(directory)        
+        logging.info("Process collaborative filtering")
+        model = str(context.function_directory) + '/../shared_code/model.dump'
+        cf = collaborative_filtering(model)        
         cf_scores = cf.get_recommendations(user_id, 0)    
 
+        logging.info("Set hybrid recommendations")
         hybrid = pd.merge(cf_scores, cbf_scores, on=['user_id','article_id'])
         hybrid['score'] = hybrid['CF'] * 2 + hybrid['CBF']
 
