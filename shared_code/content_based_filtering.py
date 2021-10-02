@@ -45,17 +45,18 @@ class content_based_filtering:
                 {"user_id": int(user_id)},
                 sort=[('click_timestamp', pymongo.DESCENDING)]
         )
-        logging.info(f"last user Doc {doc['click_article_id']}")
+        
         if doc is None:
+            logging.info(f"No document found!")
             return 0
-
+        logging.info(f"last user Doc {doc['click_article_id']}")
         return doc['click_article_id']
 
 
     def cbf_sort(self, data):
         return data[2]
 
-    def get_recommendations(self, user_id, prediction):
+    def get_recommendations(self, user_id, recommendation):
         """Get Score for article recommendation
 
         Args:
@@ -71,11 +72,11 @@ class content_based_filtering:
         for idx, article in enumerate(self.articles):
             sim = self.get_cosine_similarity(
                 np.array(self.articles[article_id]), np.array(article))
-            if sim <= 0.25:
+            if sim < 0.25:
                 cbf = 0
-            elif sim < 0.5:
+            elif sim < 0.50:
                 cbf = 1
-            elif sim <= 0.5:
+            elif sim < 0.75:
                 cbf = 2
             else:
                 cbf = 3
@@ -84,8 +85,8 @@ class content_based_filtering:
         score.sort(key=self.cbf_sort, reverse=True)
         score_df = pd.DataFrame(score, columns=['user_id', 'article_id', 'sim', 'CBF'])
 
-        if prediction > 0:
-            score_df = score_df['article_id'][:prediction]
+        if recommendation > 0:
+            score_df = score_df['article_id'][:recommendation]
             return score_df.to_json(orient = 'records')
             
         return score_df
