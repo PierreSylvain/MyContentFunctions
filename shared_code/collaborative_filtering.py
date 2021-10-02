@@ -42,7 +42,7 @@ class collaborative_filtering:
             json or dataframe: json with the list of articles IDS or dataframe with all the records
         """
         score = []
-        logging.info(self.directory + 'model.dump')
+        logging.info(self.model)
         _, algo = dump.load(self.model)        
         for article_id in self.get_articles_list(user_id):                  
             rating = algo.predict(user_id, article_id)                  
